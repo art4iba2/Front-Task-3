@@ -1,0 +1,61 @@
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+.title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-item .actions {
+  opacity: 0;
+}
+
+.chat-item:hover .actions {
+  opacity: 1;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.message.assistant {
+  justify-content: flex-start;
+}
+
+.bubble {
+  max-width: 60%;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.message.user .bubble {
+  background: #3b82f6;
+  color: white;
+}
+
+.message.assistant .bubble {
+  background: #f3f3f3;
+}
+.typing span {
+  width: 6px;
+  height: 6px;
+  background: gray;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 2px;
+  animation: pulse 1.4s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: .3 }
+  50% { opacity: 1 }
+  100% { opacity: .3 }
+}
