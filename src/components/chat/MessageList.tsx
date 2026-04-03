@@ -1,9 +1,12 @@
-import { messages } from "../../mockData"
 import Message from "./Message"
 import TypingIndicator from "./TypingIndicator"
 
-export default function MessageList() {
+interface Props {
+  messages: any[]
+  isLoading: boolean
+}
 
+export default function MessageList({ messages, isLoading }: Props) {
   return (
     <div className="message-list">
 
@@ -15,7 +18,7 @@ export default function MessageList() {
         />
       ))}
 
-      <TypingIndicator isVisible={true} />
+      <TypingIndicator isVisible={isLoading} />
 
     </div>
   )

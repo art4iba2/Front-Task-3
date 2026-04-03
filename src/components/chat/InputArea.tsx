@@ -1,34 +1,43 @@
 import { useState } from "react"
 
-export default function InputArea() {
+  interface Props {
+  onSend: (text: string) => void
+  isLoading: boolean
+}
+
+export default function InputArea({ onSend, isLoading }: Props) {
 
   const [text, setText] = useState("")
 
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 
-    if (e.key === "Enter" && !e.shiftKey) {
-
+        if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
-
-      console.log("send:", text)
-
-      setText("")
+      send()
     }
   }
+
+  const send = () => {
+  if (!text.trim()) return
+
+  onSend(text)
+  setText("")
+}
+
 
   return (
     <div className="input-area">
 
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onKeyDown={handleKey}
-        placeholder="Введите сообщение..."
-      />
+    <textarea
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      onKeyDown={handleKey}
+      disabled={isLoading}
+    />
 
-      <button disabled={!text}>
-        Отправить
-      </button>
+    <button onClick={send} disabled={!text || isLoading}>
+      Отправить
+    </button>
 
       <button>
         Стоп
