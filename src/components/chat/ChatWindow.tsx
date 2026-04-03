@@ -5,6 +5,7 @@ import { Message } from '../types/message'
 import { useState, useEffect } from "react"
 import { useContext } from "react"
 import { ChatContext } from "../../app/providers/ChatProvider"
+import { sendMessage as sendToApi } from "../../api/chat"
 
 
 
@@ -28,7 +29,7 @@ export default function ChatWindow({toggleSidebar}:Props) {
   }
 }, [state.chats.length, dispatch])
 
-    const sendMessage = (text: string) => {
+const sendMessage = async (text: string) => {
   if (!state.activeChatId) return
 
   const userMessage: Message = {
@@ -48,24 +49,41 @@ export default function ChatWindow({toggleSidebar}:Props) {
 
   dispatch({ type: "SET_LOADING", payload: true })
 
-  setTimeout(() => {
+  try {
+    const currentChat = state.chats.find(c => c.id === state.activeChatId)
+
+    const response = await sendToApi([
+    ...(currentChat?.messages.map(m => ({
+      role: m.role,
+      content: m.content,
+    })) || []),
+
+    {
+      role: "user",
+      content: text,
+    }
+  ])
+
     const botMessage: Message = {
       id: Date.now().toString(),
       role: "assistant",
-      content: "Ответ бота 🤖",
+      content: response,
       timestamp: new Date().toLocaleTimeString(),
     }
 
     dispatch({
       type: "ADD_MESSAGE",
       payload: {
-        chatId: state.activeChatId!,
+        chatId: state.activeChatId,
         message: botMessage,
       },
     })
 
+  } catch (e) {
+    console.error(e)
+  } finally {
     dispatch({ type: "SET_LOADING", payload: false })
-  }, 1500)
+  }
 }
 
   return (

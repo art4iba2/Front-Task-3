@@ -11,6 +11,9 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",
@@ -41,5 +44,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "description": "In the project directory, you can run:",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
 }
