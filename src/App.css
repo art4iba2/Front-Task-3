@@ -20,6 +20,7 @@
 .message {
   display: flex;
   margin-bottom: 12px;
+  position: relative;
 }
 
 .message.user {
@@ -30,10 +31,23 @@
   justify-content: flex-start;
 }
 
+.copy {
+  opacity: 0;
+  transition: 0.2s;
+  position: absolute;
+  right: -30px;
+  top: 0;
+}
+
+.message:hover .copy {
+  opacity: 1;
+}
+
 .bubble {
   max-width: 60%;
   padding: 10px;
   border-radius: 10px;
+  word-wrap: break-word;
 }
 
 .message.user .bubble {
@@ -58,4 +72,14 @@
   0% { opacity: .3 }
   50% { opacity: 1 }
   100% { opacity: .3 }
+}
+
+.input-area textarea {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .bubble {
+    max-width: 60%;
+  }
 }

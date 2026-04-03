@@ -10,14 +10,13 @@ interface Props{
 
 export default function ChatWindow({toggleSidebar}:Props) {
 
-  const [openSettings, setOpenSettings] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const bottomRef = useRef<HTMLDivElement | null>(null)
+    const [openSettings, setOpenSettings] = useState(false)
+    const [messages, setMessages] = useState<Message[]>([])
+    const [isLoading, setIsLoading] = useState(false)
+    const stopGeneration = () => {
+  setIsLoading(false)
+}
 
-  useEffect(() => {
-  bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [messages, isLoading])
 
   const sendMessage = (text: string) => {
   const userMessage: Message = {
@@ -61,8 +60,11 @@ export default function ChatWindow({toggleSidebar}:Props) {
       </header>
 
       <MessageList messages={messages} isLoading={isLoading} />
-      <div ref={bottomRef} />
-      <InputArea onSend={sendMessage} isLoading={isLoading} />
+      <InputArea
+          onSend={sendMessage}
+          isLoading={isLoading}
+          onStop={stopGeneration}
+      />
 
       {openSettings && (
         <SettingsPanel onClose={() => setOpenSettings(false)} />

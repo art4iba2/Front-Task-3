@@ -1,51 +1,48 @@
-import { useState } from "react"
+import {useState} from "react";
 
-  interface Props {
+interface Props {
   onSend: (text: string) => void
   isLoading: boolean
+  onStop?: () => void
 }
 
-export default function InputArea({ onSend, isLoading }: Props) {
-
+export default function InputArea({ onSend, isLoading, onStop }: Props) {
   const [text, setText] = useState("")
 
-  const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const send = () => {
+    if (!text.trim()) return
 
-        if (e.key === "Enter" && !e.shiftKey) {
+    onSend(text)
+    setText("")
+  }
+
+  const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       send()
     }
   }
 
-  const send = () => {
-  if (!text.trim()) return
-
-  onSend(text)
-  setText("")
-}
-
-
   return (
     <div className="input-area">
 
-    <textarea
-      value={text}
-      onChange={(e) => setText(e.target.value)}
-      onKeyDown={handleKey}
-      disabled={isLoading}
-    />
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={handleKey}
+        placeholder="Введите сообщение..."
+        disabled={isLoading}
+      />
 
-    <button onClick={send} disabled={!text || isLoading}>
-      Отправить
-    </button>
-
-      <button>
-        Стоп
-      </button>
-
-      <button>
-        📎
-      </button>
+      {isLoading ? (
+        <button onClick={onStop}>
+          Стоп
+        </button>
+      ) : (
+        <button onClick={send} disabled={!text.trim()}>
+          Отправить
+        </button>
+      )}
 
     </div>
   )

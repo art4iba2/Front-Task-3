@@ -1,5 +1,6 @@
 import Message from "./Message"
 import TypingIndicator from "./TypingIndicator"
+import { useRef, useEffect } from "react"
 
 interface Props {
   messages: any[]
@@ -7,6 +8,12 @@ interface Props {
 }
 
 export default function MessageList({ messages, isLoading }: Props) {
+  const bottomRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages, isLoading])
+
   return (
     <div className="message-list">
 
@@ -19,6 +26,8 @@ export default function MessageList({ messages, isLoading }: Props) {
       ))}
 
       <TypingIndicator isVisible={isLoading} />
+
+      <div ref={bottomRef} />
 
     </div>
   )

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import ReactMarkdown from "react-markdown"
 
 interface Props {
@@ -6,21 +7,41 @@ interface Props {
 }
 
 export default function Message({ role, content }: Props) {
+  const [copied, setCopied] = useState(false)
+
+const copy = async () => {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(content)
+    } else {
+      const textarea = document.createElement("textarea")
+      textarea.value = content
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
+    }
+
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+
+  } catch (err) {
+    console.error("Ошибка копирования:", err)
+  }
+}
 
   return (
     <div className={`message ${role}`}>
 
       <div className="bubble">
-
-        <ReactMarkdown>
-          {content}
-        </ReactMarkdown>
-
+        <ReactMarkdown>{content}</ReactMarkdown>
       </div>
 
-      <button className="copy">
-        📋
-      </button>
+      {role === "assistant" && (
+        <button className="copy" onClick={copy}>
+          {copied ? "✅ Скопировано" : "📋"}
+        </button>
+      )}
 
     </div>
   )
