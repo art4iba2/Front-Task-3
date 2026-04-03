@@ -2,7 +2,11 @@ import MessageList from "./MessageList"
 import InputArea from "./InputArea"
 import SettingsPanel from "../settings/SettingsPanel"
 import { Message } from '../types/message'
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect } from "react"
+import { useContext } from "react"
+import { ChatContext } from "../../app/providers/ChatProvider"
+
+
 
 interface Props{
   toggleSidebar: () => void
@@ -11,34 +15,56 @@ interface Props{
 export default function ChatWindow({toggleSidebar}:Props) {
 
     const [openSettings, setOpenSettings] = useState(false)
-    const [messages, setMessages] = useState<Message[]>([])
-    const [isLoading, setIsLoading] = useState(false)
     const stopGeneration = () => {
-  setIsLoading(false)
+  dispatch({ type: "SET_LOADING", payload: false })
 }
 
+  const { state, dispatch } = useContext(ChatContext)!
+  const activeChat = state.chats.find(c => c.id === state.activeChatId)
 
-  const sendMessage = (text: string) => {
+    useEffect(() => {
+  if (state.chats.length === 0) {
+    dispatch({ type: "CREATE_CHAT" })
+  }
+}, [state.chats.length, dispatch])
+
+    const sendMessage = (text: string) => {
+  if (!state.activeChatId) return
+
   const userMessage: Message = {
     id: Date.now().toString(),
-    role: "user" as const,
+    role: "user",
     content: text,
     timestamp: new Date().toLocaleTimeString(),
   }
 
-  setMessages(prev => [...prev, userMessage])
-  setIsLoading(true)
+  dispatch({
+    type: "ADD_MESSAGE",
+    payload: {
+      chatId: state.activeChatId,
+      message: userMessage,
+    },
+  })
+
+  dispatch({ type: "SET_LOADING", payload: true })
 
   setTimeout(() => {
-    const botMessage = {
+    const botMessage: Message = {
       id: Date.now().toString(),
-      role: "assistant" as const,
-      content: "Это ответ бота",
+      role: "assistant",
+      content: "Ответ бота 🤖",
       timestamp: new Date().toLocaleTimeString(),
     }
 
-    setMessages(prev => [...prev, botMessage])
-    setIsLoading(false)
+    dispatch({
+      type: "ADD_MESSAGE",
+      payload: {
+        chatId: state.activeChatId!,
+        message: botMessage,
+      },
+    })
+
+    dispatch({ type: "SET_LOADING", payload: false })
   }, 1500)
 }
 
@@ -51,7 +77,7 @@ export default function ChatWindow({toggleSidebar}:Props) {
           ☰
         </button>
 
-        <h3>React помощь</h3>
+        <h3>{activeChat?.title || "Новый чат"}</h3>
 
         <button onClick={() => setOpenSettings(true)}>
           ⚙
@@ -59,10 +85,13 @@ export default function ChatWindow({toggleSidebar}:Props) {
 
       </header>
 
-      <MessageList messages={messages} isLoading={isLoading} />
+      <MessageList
+          messages={activeChat?.messages || []}
+          isLoading={state.isLoading}
+      />
       <InputArea
           onSend={sendMessage}
-          isLoading={isLoading}
+          isLoading={state.isLoading}
           onStop={stopGeneration}
       />
 

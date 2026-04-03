@@ -83,3 +83,35 @@
     max-width: 60%;
   }
 }
+.chat-item.active {
+  background: #e5e7eb;
+}
+
+.chat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete {
+  opacity: 0;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.actions {
+  opacity: 0;
+  transition: 0.2s;
+}
+
+.chat-item:hover .delete {
+  opacity: 1;
+}
+
+.chat-item:hover .actions {
+  opacity: 1;
+}
+
+.chat-item input {
+  width: 100%;
+}

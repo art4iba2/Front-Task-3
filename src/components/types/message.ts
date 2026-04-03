@@ -4,3 +4,14 @@ export type Message = {
   content: string
   timestamp: string
 }
+export type Chat = {
+  id: string
+  title: string
+  messages: Message[]
+}
+
+export type ChatState = {
+  chats: Chat[]
+  activeChatId: string | null
+  isLoading: boolean
+}
