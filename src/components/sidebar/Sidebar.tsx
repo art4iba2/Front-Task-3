@@ -1,43 +1,41 @@
 import SearchInput from "./SearchInput"
-import {useContext, useState} from "react"
+import { useContext, useMemo, useState } from "react"
 import { ChatContext } from "../../app/providers/ChatProvider"
 
-interface Props{
-  open:boolean
+interface Props {
+  open: boolean
 }
 
-export default function Sidebar({open}:Props){
+export default function Sidebar({ open }: Props) {
+  const { state, dispatch } = useContext(ChatContext)!
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [title, setTitle] = useState("")
+  const [query, setQuery] = useState("")
 
-    const { state, dispatch } = useContext(ChatContext)!
-    const [editingId, setEditingId] = useState<string | null>(null)
-    const [title, setTitle] = useState("")
+  const filteredChats = useMemo(() => {
+    const search = query.trim().toLowerCase()
+    if (!search) return state.chats
 
-  return(
+    return state.chats.filter((chat) => chat.title.toLowerCase().includes(search))
+  }, [query, state.chats])
+
+  return (
     <aside className={`sidebar ${open ? "open" : "closed"}`}>
+      <button className="new-chat" onClick={() => dispatch({ type: "CREATE_CHAT" })}>
+        + Новый чат
+      </button>
 
-        <button
-          className="new-chat"
-          onClick={() => dispatch({ type: "CREATE_CHAT" })}
-        >
-          + Новый чат
-        </button>
-
-      <SearchInput />
-        <div>
-
-          {state.chats.map(chat => (
+      <SearchInput value={query} onChange={setQuery} />
+      <div>
+        {filteredChats.map((chat) => (
           <div
             key={chat.id}
             className={`chat-item ${chat.id === state.activeChatId ? "active" : ""}`}
           >
-
             <div
               className="chat-info"
-              onClick={() =>
-                dispatch({ type: "SET_ACTIVE_CHAT", payload: chat.id })
-              }
+              onClick={() => dispatch({ type: "SET_ACTIVE_CHAT", payload: chat.id })}
             >
-
               {editingId === chat.id ? (
                 <input
                   value={title}
@@ -69,11 +67,9 @@ export default function Sidebar({open}:Props){
               ) : (
                 <span className="chat-title">{chat.title}</span>
               )}
-
             </div>
 
             <div className="actions">
-
               <button
                 onClick={() => {
                   setEditingId(chat.id)
@@ -92,14 +88,10 @@ export default function Sidebar({open}:Props){
               >
                 🗑
               </button>
-
             </div>
-
           </div>
         ))}
-
-        </div>
-
+      </div>
     </aside>
   )
 }
