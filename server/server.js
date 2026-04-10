@@ -1,6 +1,7 @@
 import express from "express"
 import cors from "cors"
-
+import dotenv from "dotenv"
+dotenv.config()
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 const app = express()
@@ -28,7 +29,7 @@ app.post("/api/chat", async (req, res) => {
     )
 
     const data = await response.json()
-
+    console.log("Using token:", TOKEN ? TOKEN.slice(0, 10) : "NO TOKEN")
     console.log("GigaChat response:", data)
 
     res.json(data)

@@ -1,5 +1,7 @@
 import { createContext, useReducer, ReactNode } from "react"
 import { Chat, ChatState, Message } from "../../components/types/message"
+import { loadState, saveState } from "../../utils/storage"
+import { useEffect } from "react"
 
 type Action =
   | { type: "CREATE_CHAT" }
@@ -82,8 +84,16 @@ export const ChatContext = createContext<{
 } | null>(null)
 
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const persistedState = loadState()
 
+  const [state, dispatch] = useReducer(
+    reducer,
+    persistedState || initialState
+  )
+
+  useEffect(() => {
+    saveState(state)
+  }, [state])
   return (
     <ChatContext.Provider value={{ state, dispatch }}>
       {children}
