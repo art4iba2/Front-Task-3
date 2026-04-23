@@ -5,7 +5,7 @@ import ErrorBoundary from "../ui/ErrorBoundary"
 import ErrorMessage from "../ui/ErrorMessage"
 import { Message } from "../types/message"
 import { ChatContext } from "../../app/providers/ChatProvider"
-import { sendMessage as sendToApi } from "../../api/chat"
+import chatApi from "../../api/chat"
 
 const SettingsPanel = lazy(() => import("../settings/SettingsPanel"))
 
@@ -72,7 +72,7 @@ if (state.activeChatId !== chatId) {
       try {
         const currentChat = state.chats.find((c) => c.id === state.activeChatId)
 
-        const response = await sendToApi([
+        const response = await chatApi.sendMessage([
           ...(currentChat?.messages.map((m) => ({
             role: m.role,
             content: m.content,

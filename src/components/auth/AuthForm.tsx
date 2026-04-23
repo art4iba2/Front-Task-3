@@ -1,6 +1,6 @@
 import { useState } from "react"
 import ErrorMessage from "../ui/ErrorMessage"
-import { setGigaChatToken } from "../../api/chat"
+import chatApi from "../../api/chat"
 
 interface Props {
   onLogin: () => void
@@ -21,11 +21,11 @@ export default function AuthForm({ onLogin }: Props) {
     setIsSubmitting(true)
 
     try {
-      await setGigaChatToken(cred)
+      await chatApi.setGigaChatToken(cred)
       onLogin()
     } catch (e) {
       console.error(e)
-      setError("Не удалось сохранить токен. Проверьте, что backend запущен.")
+      setError("Не удалось сохранить токен. Проверьте корректность токена и доступность API.")
     } finally {
       setIsSubmitting(false)
     }

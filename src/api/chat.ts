@@ -13,8 +13,7 @@ const makeUrl = (path: string) => `${API_URL}${path}`
 
 const readToken = () => localStorage.getItem(TOKEN_STORAGE_KEY)?.trim() || ""
 
-
-export async function setGigaChatToken(token: string) {
+async function setGigaChatToken(token: string) {
   const normalizedToken = token.trim()
 
   if (!normalizedToken) {
@@ -37,7 +36,7 @@ export async function setGigaChatToken(token: string) {
   }
 }
 
-export async function sendMessage(messages: any[]) {
+async function sendMessage(messages: any[]) {
   const token = readToken()
 
   if (!token) {
@@ -60,3 +59,12 @@ export async function sendMessage(messages: any[]) {
 
   return data.choices?.[0]?.message?.content || "Ошибка ответа"
 }
+
+export { setGigaChatToken, sendMessage }
+
+const chatApi = {
+  setGigaChatToken,
+  sendMessage,
+}
+
+export default chatApi
