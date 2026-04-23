@@ -1,16 +1,21 @@
 const rawApiUrl = process.env.REACT_APP_API_URL?.trim()
 
-const API_URL = rawApiUrl
-  ? rawApiUrl.replace(/\/$/, "")
-  : window.location.hostname === "localhost"
-    ? "http://localhost:3001"
-    : ""
 
+const API_URL =
+  process.env.REACT_APP_API_URL?.replace(/\/$/, "") || ""
+
+console.log("API_URL:", API_URL)
 const makeUrl = (path: string) => `${API_URL}${path}`
 
 let currentToken = ""
 
+try {
+  const saved = localStorage.getItem("gigachat_token")
+  if (saved) currentToken = saved
+} catch {}
+
 async function setGigaChatToken(token: string) {
+  console.log("setGigaChatToken called with:", token)
   const normalizedToken = token.trim()
 
   if (!normalizedToken) {
@@ -20,10 +25,8 @@ async function setGigaChatToken(token: string) {
   currentToken = normalizedToken
 
   try {
-    localStorage.removeItem("gigachat_token")
-  } catch {
-    // ignore
-  }
+    localStorage.setItem("gigachat_token", normalizedToken)
+  } catch {}
 }
 
 async function sendMessage(messages: any[]) {

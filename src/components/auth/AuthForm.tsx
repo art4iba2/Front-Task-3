@@ -12,6 +12,8 @@ export default function AuthForm({ onLogin }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const submit = async () => {
+    console.log("TOKEN из input:", cred)
+
     if (!cred.trim()) {
       setError("Токен обязателен")
       return
