@@ -6,12 +6,9 @@ const API_URL = rawApiUrl
     ? "http://localhost:3001"
     : ""
 
-const TOKEN_STORAGE_KEY = "gigachat_token"
-
-
 const makeUrl = (path: string) => `${API_URL}${path}`
 
-const readToken = () => localStorage.getItem(TOKEN_STORAGE_KEY)?.trim() || ""
+let currentToken = ""
 
 async function setGigaChatToken(token: string) {
   const normalizedToken = token.trim()
@@ -20,38 +17,27 @@ async function setGigaChatToken(token: string) {
     throw new Error("Токен обязателен")
   }
 
-  localStorage.setItem(TOKEN_STORAGE_KEY, normalizedToken)
+  currentToken = normalizedToken
 
-  const res = await fetch(makeUrl("/api/token"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ token: normalizedToken }),
-  })
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}))
-    throw new Error(errorData.error || "Не удалось сохранить токен")
+  try {
+    localStorage.removeItem("gigachat_token")
+  } catch {
+    // ignore
   }
 }
 
 async function sendMessage(messages: any[]) {
-  const token = readToken()
-
-  if (!token) {
+  if (!currentToken) {
     throw new Error("Токен GigaChat не установлен")
   }
-
   const res = await fetch(makeUrl("/api/chat"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ messages, token }),
+    body: JSON.stringify({ messages, token: currentToken }),
   })
-
-  const data = await res.json()
+  const data = await res.json().catch(() => ({}))
 
   if (!res.ok) {
     throw new Error(data.error || "Ошибка ответа")
@@ -60,11 +46,10 @@ async function sendMessage(messages: any[]) {
   return data.choices?.[0]?.message?.content || "Ошибка ответа"
 }
 
-export { setGigaChatToken, sendMessage }
-
 const chatApi = {
   setGigaChatToken,
   sendMessage,
 }
 
 export default chatApi
+export { setGigaChatToken, sendMessage }
