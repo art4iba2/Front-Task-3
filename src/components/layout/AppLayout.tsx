@@ -11,14 +11,27 @@ export default function AppLayout({ children, navigate }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="layout">
-      <Suspense fallback={<aside className="sidebar">Загрузка меню...</aside>}>
-        <Sidebar open={sidebarOpen} navigate={navigate} />
-      </Suspense>
+  <div className="layout">
 
-      {cloneElement(children as ReactElement<any>, {
-        toggleSidebar: () => setSidebarOpen(!sidebarOpen),
-      })}
-    </div>
-  )
+    {/* overlay */}
+    {sidebarOpen && (
+      <div
+        className="overlay"
+        onClick={() => setSidebarOpen(false)}
+      />
+    )}
+
+    <Suspense fallback={<aside className="sidebar">Загрузка меню...</aside>}>
+      <Sidebar
+        open={sidebarOpen}
+        navigate={navigate}
+        onClose={() => setSidebarOpen(false)}
+      />
+    </Suspense>
+
+    {cloneElement(children as ReactElement<any>, {
+      toggleSidebar: () => setSidebarOpen(!sidebarOpen),
+    })}
+  </div>
+)
 }

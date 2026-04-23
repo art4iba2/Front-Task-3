@@ -6,9 +6,10 @@ import ChatItem from "./ChatItem"
 interface Props {
   open: boolean
   navigate: (path: string, replace?: boolean) => void
+  onClose: () => void
 }
 
-export default function Sidebar({ open, navigate }: Props) {
+export default function Sidebar({ open, navigate, onClose}: Props) {
   const { state, dispatch } = useContext(ChatContext)!
 
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -28,13 +29,14 @@ export default function Sidebar({ open, navigate }: Props) {
     navigate(`/chat/${newId}`)
   }, [dispatch, navigate])
 
-  const handleSelect = useCallback(
-    (id: string) => {
-      dispatch({ type: "SET_ACTIVE_CHAT", payload: id })
-      navigate(`/chat/${id}`)
-    },
-    [dispatch, navigate]
-  )
+    const handleSelect = useCallback(
+      (id: string) => {
+        dispatch({ type: "SET_ACTIVE_CHAT", payload: id })
+        navigate(`/chat/${id}`)
+        onClose()
+      },
+      [dispatch, navigate, onClose]
+    )
 
   const handleDelete = useCallback(
     (id: string) => {

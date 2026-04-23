@@ -7,7 +7,7 @@ import type { ChatState } from '../types/message'
 function renderSidebar(state: ChatState, dispatch = jest.fn()) {
   return render(
     <ChatContext.Provider value={{ state, dispatch }}>
-      <Sidebar open={true} navigate={jest.fn()} />
+      <Sidebar open={true} navigate={jest.fn()} onClose={jest.fn()}/>
     </ChatContext.Provider>
   )
 }
