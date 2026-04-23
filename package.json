@@ -51,5 +51,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "source-map-explorer": "^2.5.3",
+    "webpack-bundle-analyzer": "^5.3.0"
+  }
 }
