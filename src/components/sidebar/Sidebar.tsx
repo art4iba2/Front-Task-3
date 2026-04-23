@@ -1,13 +1,16 @@
 import SearchInput from "./SearchInput"
-import { useContext, useMemo, useState } from "react"
+import { useContext, useMemo, useState, useCallback } from "react"
 import { ChatContext } from "../../app/providers/ChatProvider"
+import ChatItem from "./ChatItem"
 
 interface Props {
   open: boolean
+  navigate: (path: string, replace?: boolean) => void
 }
 
-export default function Sidebar({ open }: Props) {
+export default function Sidebar({ open, navigate }: Props) {
   const { state, dispatch } = useContext(ChatContext)!
+
   const [editingId, setEditingId] = useState<string | null>(null)
   const [title, setTitle] = useState("")
   const [query, setQuery] = useState("")
@@ -19,77 +22,73 @@ export default function Sidebar({ open }: Props) {
     return state.chats.filter((chat) => chat.title.toLowerCase().includes(search))
   }, [query, state.chats])
 
+  const handleCreateChat = useCallback(() => {
+    const newId = Date.now().toString()
+    dispatch({ type: "CREATE_CHAT", payload: newId })
+    navigate(`/chat/${newId}`)
+  }, [dispatch, navigate])
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      dispatch({ type: "SET_ACTIVE_CHAT", payload: id })
+      navigate(`/chat/${id}`)
+    },
+    [dispatch, navigate]
+  )
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      if (!window.confirm("Удалить чат?")) return
+
+      dispatch({ type: "DELETE_CHAT", payload: id })
+      if (state.activeChatId === id) {
+        navigate("/")
+      }
+    },
+    [dispatch, navigate, state.activeChatId]
+  )
+
+  const handleRename = useCallback(
+    (id: string) => {
+      dispatch({
+        type: "RENAME_CHAT",
+        payload: {
+          id,
+          title: title.trim() || "Новый чат",
+        },
+      })
+      setEditingId(null)
+    },
+    [dispatch, title]
+  )
+
+  const handleStartEdit = useCallback((id: string, currentTitle: string) => {
+    setEditingId(id)
+    setTitle(currentTitle)
+  }, [])
+
   return (
     <aside className={`sidebar ${open ? "open" : "closed"}`}>
-      <button className="new-chat" onClick={() => dispatch({ type: "CREATE_CHAT" })}>
+      <button className="new-chat" onClick={handleCreateChat}>
         + Новый чат
       </button>
 
       <SearchInput value={query} onChange={setQuery} />
       <div>
         {filteredChats.map((chat) => (
-          <div
+          <ChatItem
             key={chat.id}
-            className={`chat-item ${chat.id === state.activeChatId ? "active" : ""}`}
-          >
-            <div
-              className="chat-info"
-              onClick={() => dispatch({ type: "SET_ACTIVE_CHAT", payload: chat.id })}
-            >
-              {editingId === chat.id ? (
-                <input
-                  value={title}
-                  autoFocus
-                  onChange={(e) => setTitle(e.target.value)}
-                  onBlur={() => {
-                    dispatch({
-                      type: "RENAME_CHAT",
-                      payload: {
-                        id: chat.id,
-                        title: title.trim() || "Новый чат",
-                      },
-                    })
-                    setEditingId(null)
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      dispatch({
-                        type: "RENAME_CHAT",
-                        payload: {
-                          id: chat.id,
-                          title: title.trim() || "Новый чат",
-                        },
-                      })
-                      setEditingId(null)
-                    }
-                  }}
-                />
-              ) : (
-                <span className="chat-title">{chat.title}</span>
-              )}
-            </div>
-
-            <div className="actions">
-              <button
-                onClick={() => {
-                  setEditingId(chat.id)
-                  setTitle(chat.title)
-                }}
-              >
-                ✏️
-              </button>
-
-              <button
-                onClick={() => {
-                  if (window.confirm("Удалить чат?")) {
-                    dispatch({ type: "DELETE_CHAT", payload: chat.id })
-                  }
-                }}
-              >
-                🗑
-              </button>
-            </div>
-          </div>
+            id={chat.id}
+            title={chat.title}
+            isActive={chat.id === state.activeChatId}
+            isEditing={editingId === chat.id}
+            editTitle={title}
+            onSelect={handleSelect}
+            onStartEdit={handleStartEdit}
+            onEditTitleChange={setTitle}
+            onCommitRename={handleRename}
+            onDelete={handleDelete}
+          />
         ))}
       </div>
     </aside>

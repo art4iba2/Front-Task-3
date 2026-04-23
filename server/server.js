@@ -9,17 +9,33 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const TOKEN = process.env.GIGACHAT_TOKEN
+let TOKEN = process.env.GIGACHAT_TOKEN || ""
+
+app.post("/api/token", (req, res) => {
+  const token = req.body?.token
+
+  if (typeof token !== "string" || !token.trim()) {
+    res.status(400).json({ error: "Токен обязателен" })
+    return
+  }
+
+  TOKEN = token.trim()
+  res.json({ ok: true })
+})
 
 app.post("/api/chat", async (req, res) => {
   try {
+      if (!TOKEN) {
+      res.status(400).json({ error: "Токен GigaChat не установлен" })
+      return
+    }
     const response = await fetch(
       "https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${TOKEN}`,
         },
         body: JSON.stringify({
           model: "GigaChat",
@@ -29,8 +45,6 @@ app.post("/api/chat", async (req, res) => {
     )
 
     const data = await response.json()
-    console.log("Using token:", TOKEN ? TOKEN.slice(0, 10) : "NO TOKEN")
-    console.log("GigaChat response:", data)
 
     res.json(data)
 

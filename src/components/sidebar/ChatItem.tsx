@@ -1,29 +1,56 @@
+import { memo } from "react"
+
 interface Props {
+  id: string
   title: string
-  date: string
+  isActive: boolean
+  isEditing: boolean
+  editTitle: string
+  onSelect: (id: string) => void
+  onStartEdit: (id: string, title: string) => void
+  onEditTitleChange: (value: string) => void
+  onCommitRename: (id: string) => void
+  onDelete: (id: string) => void
 }
 
-export default function ChatItem({ title, date }: Props) {
-
+function ChatItem({
+  id,
+  title,
+  isActive,
+  isEditing,
+  editTitle,
+  onSelect,
+  onStartEdit,
+  onEditTitleChange,
+  onCommitRename,
+  onDelete,
+}: Props) {
   return (
-    <div className="chat-item">
-
-      <div className="chat-info">
-
-        <span className="chat-title">{title}</span>
-
-        <span className="chat-date">{date}</span>
-
+    <div className={`chat-item ${isActive ? "active" : ""}`}>
+      <div className="chat-info" onClick={() => onSelect(id)}>
+        {isEditing ? (
+          <input
+            value={editTitle}
+            autoFocus
+            onChange={(e) => onEditTitleChange(e.target.value)}
+            onBlur={() => onCommitRename(id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onCommitRename(id)
+              }
+            }}
+          />
+        ) : (
+          <span className="chat-title">{title}</span>
+        )}
       </div>
+      <div className="actions">
+        <button onClick={() => onStartEdit(id, title)}>✏️</button>
 
-      <div className="chat-actions">
-
-        <button>✏️</button>
-
-        <button>🗑</button>
-
+        <button onClick={() => onDelete(id)}>🗑</button>
       </div>
-
     </div>
   )
 }
+
+export default memo(ChatItem)

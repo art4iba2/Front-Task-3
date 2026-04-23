@@ -1,33 +1,43 @@
 import { useState } from "react"
 import ErrorMessage from "../ui/ErrorMessage"
+import { setGigaChatToken } from "../../api/chat"
 
 interface Props {
   onLogin: () => void
 }
 
 export default function AuthForm({ onLogin }: Props) {
-
   const [cred, setCred] = useState("")
   const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const submit = () => {
-
-    if (!cred) {
-      setError("Credentials обязательны")
+  const submit = async () => {
+    if (!cred.trim()) {
+      setError("Токен обязателен")
       return
     }
 
-    onLogin()
+    setError("")
+    setIsSubmitting(true)
+
+    try {
+      await setGigaChatToken(cred)
+      onLogin()
+    } catch (e) {
+      console.error(e)
+      setError("Не удалось сохранить токен. Проверьте, что backend запущен.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <div className="auth">
-
       <h2>Авторизация</h2>
 
       <input
         type="password"
-        placeholder="Credentials"
+        placeholder="Введите токен GigaChat"
         value={cred}
         onChange={(e) => setCred(e.target.value)}
       />
@@ -53,8 +63,8 @@ export default function AuthForm({ onLogin }: Props) {
 
       </div>
 
-      <button onClick={submit}>
-        Войти
+      <button onClick={submit} disabled={isSubmitting}>
+        {isSubmitting ? "Сохранение..." : "Войти"}
       </button>
 
     </div>

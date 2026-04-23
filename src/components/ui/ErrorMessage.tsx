@@ -1,10 +1,17 @@
-export default function ErrorMessage({ text }: { text: string }) {
+interface Props {
+  text: string
+  onRetry?: () => void
+}
 
+export default function ErrorMessage({ text, onRetry }: Props) {
   return (
     <div className="error">
-
-      ❌ {text}
-
+      <span>❌ {text}</span>
+      {onRetry && (
+        <button className="error-retry" onClick={onRetry}>
+          Повторить
+        </button>
+      )}
     </div>
   )
 }

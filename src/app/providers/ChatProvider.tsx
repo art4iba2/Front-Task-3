@@ -3,7 +3,7 @@ import { Chat, ChatState, Message } from "../../components/types/message"
 import { loadState, saveState } from "../../utils/storage"
 
 export type Action =
-  | { type: "CREATE_CHAT" }
+  | { type: "CREATE_CHAT"; payload?: string }
   | { type: "SET_ACTIVE_CHAT"; payload: string }
   | { type: "ADD_MESSAGE"; payload: { chatId: string; message: Message } }
   | { type: "SET_LOADING"; payload: boolean }
@@ -20,7 +20,7 @@ export function reducer(state: ChatState, action: Action): ChatState {
   switch (action.type) {
     case "CREATE_CHAT": {
       const newChat: Chat = {
-        id: Date.now().toString(),
+        id: action.payload || Date.now().toString(),
         title: "Новый чат",
         messages: [],
       }
@@ -41,7 +41,7 @@ export function reducer(state: ChatState, action: Action): ChatState {
     case "ADD_MESSAGE":
       return {
         ...state,
-        chats: state.chats.map(chat =>
+        chats: state.chats.map((chat) =>
           chat.id === action.payload.chatId
             ? { ...chat, messages: [...chat.messages, action.payload.message] }
             : chat
@@ -49,7 +49,7 @@ export function reducer(state: ChatState, action: Action): ChatState {
       }
 
     case "DELETE_CHAT": {
-      const filteredChats = state.chats.filter(chat => chat.id !== action.payload)
+      const filteredChats = state.chats.filter((chat) => chat.id !== action.payload)
 
       return {
         ...state,
@@ -64,10 +64,8 @@ export function reducer(state: ChatState, action: Action): ChatState {
     case "RENAME_CHAT":
       return {
         ...state,
-        chats: state.chats.map(chat =>
-          chat.id === action.payload.id
-            ? { ...chat, title: action.payload.title }
-            : chat
+        chats: state.chats.map((chat) =>
+          chat.id === action.payload.id ? { ...chat, title: action.payload.title } : chat
         ),
       }
 

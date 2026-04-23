@@ -1,18 +1,24 @@
-import { useState } from "react"
-import Sidebar from "../sidebar/Sidebar"
-import ChatWindow from "../chat/ChatWindow"
+import { lazy, ReactElement, Suspense, useState, cloneElement } from "react"
 
-export default function AppLayout() {
+const Sidebar = lazy(() => import("../sidebar/Sidebar"))
 
-  const [sidebarOpen,setSidebarOpen] = useState(false)
+interface Props {
+  children: ReactElement
+  navigate: (path: string, replace?: boolean) => void
+}
+
+export default function AppLayout({ children, navigate }: Props) {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="layout">
+      <Suspense fallback={<aside className="sidebar">Загрузка меню...</aside>}>
+        <Sidebar open={sidebarOpen} navigate={navigate} />
+      </Suspense>
 
-      <Sidebar open={sidebarOpen} />
-
-      <ChatWindow toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-
+      {cloneElement(children as ReactElement<any>, {
+        toggleSidebar: () => setSidebarOpen(!sidebarOpen),
+      })}
     </div>
   )
 }
