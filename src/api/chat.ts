@@ -1,7 +1,15 @@
-const API_URL = "http://localhost:3001"
+const rawApiUrl = process.env.REACT_APP_API_URL?.trim()
+
+const API_URL = rawApiUrl
+  ? rawApiUrl.replace(/\/$/, "")
+  : window.location.hostname === "localhost"
+    ? "http://localhost:3001"
+    : ""
+
+const makeUrl = (path: string) => `${API_URL}${path}`
 
 export async function setGigaChatToken(token: string) {
-  const res = await fetch(`${API_URL}/api/token`, {
+  const res = await fetch(makeUrl("/api/token"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -15,8 +23,9 @@ export async function setGigaChatToken(token: string) {
   }
 }
 
+
 export async function sendMessage(messages: any[]) {
-  const res = await fetch(`${API_URL}/api/chat`, {
+  const res = await fetch(makeUrl("/api/chat"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
