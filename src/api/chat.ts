@@ -1,6 +1,3 @@
-const rawApiUrl = process.env.REACT_APP_API_URL?.trim()
-
-
 const API_URL =
   process.env.REACT_APP_API_URL?.replace(/\/$/, "") || ""
 
