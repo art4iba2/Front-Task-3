@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react
 import AuthForm from "./components/auth/AuthForm"
 import { ChatProvider } from "./app/providers/ChatProvider"
 import AppLayout from "./components/layout/AppLayout"
+import "./styles/theme.css"
 
 const HomePage = lazy(() => import("./routes/HomePage"))
 const ChatPage = lazy(() => import("./routes/ChatPage"))
